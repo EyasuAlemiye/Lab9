@@ -1,0 +1,246 @@
+#Syntaxkontroll
+
+from wordqueue import LinkedQ
+
+#<formel>::= <mol> \n
+#<mol>   ::= <group> | <group><mol>
+#<group> ::= <atom> |<atom><num> | (<mol>) <num>
+#<atom>  ::= <LETTER> | <LETTER><letter>        SOLVED
+#<LETTER>::= A | B | C | ... | Z                SOLVED
+#<letter>::= a | b | c | ... | z                SOLVED
+#<num>   ::= 2 | 3 | 4 | ...                    SOLVED
+
+#Tagen ur kodexempel i Föreläsning 13. Andra variablnamn
+class Inkorrektmolekylformat(Exception): 
+    pass
+
+
+#Tagen ur kodexempel i Föreläsning 13. Andra variablnamn
+def Kollagrammatiken(molekyl):
+    q = lagraMolekylen(molekyl) 
+    try:                                  
+        readFormel(q)                 
+        return "Formeln är syntaktiskt korrekt"     
+    except Inkorrektmolekylformat as fel:                            
+        return str(fel)  
+   
+
+def lagraMolekylen(molekyl): 
+    
+    q = LinkedQ() #Skapar kö
+
+    molekyl = list(molekyl)  
+  
+    for i in range(len(molekyl)):
+        element=molekyl[i] 
+        try:
+            korrektelement=int(element)  
+            if isinstance(korrektelement,int):
+                molekyl[i]=korrektelement
+                continue
+                
+        except ValueError:
+            continue
+    
+    #Tagen från kodexemplet ur Föreläsning 13. Andra variabelnamn
+    for enhet in molekyl:
+        q.enqueue(enhet) 
+    q.enqueue("!")  
+    return q
+    
+
+
+
+
+
+    
+
+def readAtom(q):   #He2D
+    readcapLetter(q) #retur e2D
+    try:
+        provvariabel=int(q.peek()) #except med 'e'
+        if isinstance(provvariabel,int): 
+            readNum(q)
+        else:
+            pass
+
+    except ValueError: 
+        if isinstance(q.peek(), str): #kollar om 'e' är str. 
+            print('hej')
+            if q.peek()!='!' and q.peek().islower():
+                readletter(q) #köar in e2D). kvar i kön: 2D)
+                print('rad 72')
+                if q.peek().isdigit():
+                    print('Vi har nmr')
+                    readNum(q)
+                if q.peek()=='(':
+                    readMol(q) #NO)3 input
+            if q.peek()!='!' and q.peek().isupper(): #O)3
+                readcapLetter(q) #return )3
+                if q.peek()!=')':
+                    raise Inkorrektmolekylformat('Saknar slutparantes')
+                if q.peek()==')':
+                    q.dequeue()
+                    readNum(q)
+                
+
+
+    
+def readcapLetter(q):
+    
+    capLetter=q.dequeue()
+    print(capLetter, ' Är det utprintade värdet')
+    storbokstavlista=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+    for capelement in storbokstavlista:
+        if capLetter==capelement:
+            return
+    raise Inkorrektmolekylformat('Saknad stor bokstav vid radslutet ' + str(capLetter))   
+        
+    
+def readletter(q):
+
+    letter=q.dequeue() 
+
+    storbokstavlista=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+    litenbokstavlista=[]
+    for storbokstav in storbokstavlista:
+        litenbokstav=storbokstav.lower()
+        litenbokstavlista.append(litenbokstav)
+
+        if letter==litenbokstav:
+            return
+    raise Inkorrektmolekylformat('Saknad liten bokstav vid radslutet: '+ str(letter))  
+    
+def readNum(q):
+
+    nummer=q.dequeue()  # kö:  D). nummer=2
+    if isinstance(q.peek(), str): 
+        enhet=q.peek()
+        print(nummer, 422)
+        print(enhet, 55)
+        
+    elif nummer==1 or q.peek()==1 or nummer==0:# and not isinstance(q.peek(),str):
+        print(q.peek(),44)
+        try:
+            int(q.peek()) #kollar om 'peek()' går att omvandla till integer, om ja så concatenatas, annars hoppa ner.
+            nummer2=q.dequeue()
+            strnummer=str(nummer)
+            strnummer2=str(nummer2)
+            if nummer!=0:
+                nummer=strnummer + strnummer2
+            enhet=0
+        except ValueError: 
+            pass
+
+    nummerlista=range(1,1000,1) 
+    for heltal in nummerlista:
+        try:
+            print('pastapesto', nummer, q.peek())
+            if int(nummer)>=2 and int(nummer)==heltal and q.peek()=='!': #  D)
+                return 
+                
+        except ValueError:
+            pass
+
+        if int(nummer)==1 or int(nummer)==0:  
+            raise Inkorrektmolekylformat('För litet tal vid radslutet ') 
+        if isinstance(q.peek(),str) and q.peek()!='!':
+            print('Syntatiskt inkorrekt')   
+
+
+#<formel>::= <mol> \n
+#<mol>   ::= <group> | <group><mol>
+#<group> ::= <atom> |<atom><num> | (<mol>) <num> 
+
+
+def readMol(q): #input: (He2D)
+    #utköad=q.dequeue() #utköad=(
+    testvariabel=q.peek()# Peek= H ur He2D)
+    if not testvariabel.isdigit():#Till för felhantering
+
+        readGroup(q) #
+        if q.peek().isdigit():
+            print(5)
+        if testvariabel=='':
+            print(3)
+    else:
+        raise Inkorrektmolekylformat('Fel format. Börja inte med nummer.')
+
+def readGroup(q):
+    if q.peek()!='(':# input NO)3, kontroll på N
+        readAtom(q) #anropa med He2Dkvar i kön: 2D)
+        if q.peek().isdigit():
+            readNum(q) #input: 2D). retur D)
+        if q.peek().isupper():
+            readcapLetter(q)
+            if q.peek()!=')' and not q.peek().isupper() or q.peek().islower():
+                raise Inkorrektmolekylformat('Saknar slutparantes')
+            else:
+                readNum(q)
+    else:
+        if q.peek()=='(':
+            print(q.peek(),4444444)
+            readMol(q) 
+            print('Vi har parantes efte liten bokstav')
+            if q.peek()==')':
+                readNum(q)
+            else:
+                raise Inkorrektmolekylformat('Fel format')#Formulera
+            
+
+
+
+
+
+
+
+def readFormel(q): #Första beteckningen kan vara vad som helst. Siffra, parantes, nummer, stor eller liten bokstav. Utför anrop
+    try:
+        readMol(q)
+        
+    except ValueError: #Godtyckligt error
+        raise Inkorrektmolekylformat(' Fel format.')# Vad är formatet till? Red ut!
+
+
+
+#Installera ny main: läs in modul.
+def main(): #Kodexempel från föreläsning 13. Andra variabelnamn.
+    molekylen = input("Skriv en molekyl: ")  #Pb10
+    utfallet = Kollagrammatiken(molekylen)
+    print(utfallet)
+
+
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+'''
+#readGroup
+def readGroup(q): #Kontrollera
+
+    readAtom(q)  
+    if isinstance(q.peek(),int):
+        readNum(q) 
+    if isinstance(q.peek(),str) and q.peek()!='!':
+        readletter(q) 
+        readNum(q)
+    if q.isEmpty():
+        return
+    if q.peek()=='(':
+        readMol(q)
+        #readNum(q)
+        #if q.peek()==')':
+        #    raise Inkorrektmolekylformat('Saknad högerparentes')
+
+'''
